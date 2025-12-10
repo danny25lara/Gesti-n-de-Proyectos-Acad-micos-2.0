@@ -1,42 +1,50 @@
-// js/app.js
+// js/app.js - CÓDIGO COMPLETO Y CORREGIDO
 
-import { renderizarTabla } from './views/vistaReporte.js'; // Asegúrate de tener la carpeta 'vistas'
-import { mostrarAlerta } from './module/utilidades.js';    // Asegúrate de tener la carpeta 'modules'
+import { renderizarTabla } from './views/vistaReporte.js';
+import { mostrarAlerta } from './module/utilidades.js';
 import { 
     validarLogin,
     registrarUsuario,
-    existeAdminRegistrado,
+    existeAdminEnOrganizacion, 
     guardarProyecto,
     obtenerProyectos,
     guardarInformeProyecto
 } from './module/datos.js';
 
-// ELEMENTOS DOM - LANDING & AUTH
+// =======================================================
+// 1. REFERENCIAS AL DOM (ELEMENTOS)
+// =======================================================
+
+// LANDING & AUTH
 const contenedorLanding = document.getElementById('contenedorLanding');
 const seccionAuth = document.getElementById('seccionAuth');
 const btnIrAlLogin = document.getElementById('btnIrAlLogin');
 const btnEmpezarAhora = document.getElementById('btnEmpezarAhora');
 const btnVolverLanding = document.getElementById('btnVolverLanding');
 
-// ELEMENTOS DOM - APP
+// APP PRINCIPAL
 const aplicacionPrincipal = document.getElementById('aplicacionPrincipal');
-const coheteHero = document.querySelector('.icono-hero'); // Dentro de seccionAuth
+const coheteHero = document.querySelector('.icono-hero'); 
 
-// FORMULARIOS AUTH
+// FORMULARIOS DE AUTENTICACIÓN
 const formLogin = document.getElementById('formLogin');
 const formRegistro = document.getElementById('formRegistro');
 const linkIrRegistro = document.getElementById('irARegistro');
 const linkIrLogin = document.getElementById('irALogin');
+
+// INPUTS
 const inputUser = document.getElementById('inputUsuario');
 const inputPass = document.getElementById('inputPassword');
 const btnLogin = document.getElementById('btnLogin');
+
+const regOrg = document.getElementById('regOrg'); // <--- EL NUEVO INPUT IMPORTANTE
 const regEmail = document.getElementById('regEmail');
 const regPass = document.getElementById('regPass');
 const checkAdmin = document.getElementById('checkEsAdmin');
 const btnRegistrar = document.getElementById('btnRegistrar');
 const infoAdmin = document.getElementById('infoAdmin');
 
-// NAVEGACIÓN APP
+// NAVEGACIÓN DENTRO DE LA APP
 const btnReporte = document.getElementById('btnVerReporte');
 const btnRegistro = document.getElementById('btnVerRegistro');
 const btnInformes = document.getElementById('btnVerInformes'); 
@@ -45,16 +53,17 @@ const secReporte = document.getElementById('seccionReporte');
 const secRegistro = document.getElementById('seccionRegistro');
 const secInformes = document.getElementById('seccionInformes');
 
-// OTROS
+// OTROS ELEMENTOS
 const selectProyectos = document.getElementById('selProyectoInforme');
 const txtInforme = document.getElementById('txtCuerpoInforme');
 const btnGuardarInf = document.getElementById('btnGuardarInforme');
 const btnImprimir = document.getElementById('btnImprimir');
+const fechaImpresion = document.getElementById('fechaImpresion');
 const formNuevoProyecto = document.getElementById('formularioProyecto');
 
 
 // =======================================================
-// 1. LÓGICA DE NAVEGACIÓN (LANDING <-> LOGIN)
+// 2. LÓGICA DE NAVEGACIÓN (LANDING <-> LOGIN)
 // =======================================================
 
 function mostrarLogin() {
@@ -75,68 +84,57 @@ if(btnVolverLanding) btnVolverLanding.addEventListener('click', volverALanding);
 
 
 // =======================================================
-// 2. AUTENTICACIÓN
+// 3. AUTENTICACIÓN MULTI-EMPRESA 🏢
 // =======================================================
 
-// =======================================================
-// CONFIGURACIÓN DE ÍCONOS SVG (DISEÑO PROFESIONAL)
-// =======================================================
-
-// 1. Código del Ícono "Ojo Abierto" (Ver)
-const iconVer = `
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px; height: 20px;">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-</svg>
-`;
-// 2. Código del Ícono "Ojo Tachado" (Ocultar - Como tu imagen)
-const iconOcultar = `
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px; height: 20px;">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
-</svg>
-`;
-// 3. Función Lógica
+// CONFIGURACIÓN DEL OJITO (VER CONTRASEÑA)
 function configurarOjo(idInput, idIcono) {
     const input = document.getElementById(idInput);
     const icono = document.getElementById(idIcono);
-
     if (input && icono) {
-        // Poner el ícono inicial (Ojo Tachado por defecto, o Abierto, según prefieras)
-        // Usualmente las contraseñas inician ocultas, así que ponemos el ícono de "ver" para activarlo
-        icono.innerHTML = iconVer; 
-
+        // Iconos SVG
+        const iconVer = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:20px"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>`;
+        const iconOcultar = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:20px"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>`;
+        
+        icono.innerHTML = iconVer;
         icono.addEventListener('click', () => {
             if (input.type === "password") {
-                input.type = "text"; // Mostrar texto
-                icono.innerHTML = iconOcultar; // Cambiar a ojo tachado
+                input.type = "text";
+                icono.innerHTML = iconOcultar;
             } else {
-                input.type = "password"; // Ocultar texto
-                icono.innerHTML = iconVer; // Cambiar a ojo normal
+                input.type = "password";
+                icono.innerHTML = iconVer;
             }
         });
     }
 }
-
-// Inicializar
 configurarOjo('inputPassword', 'ojoLogin');
 configurarOjo('regPass', 'ojoRegistro');
 
-// Cambiar entre Login y Registro
-linkIrRegistro.addEventListener('click', async (e) => {
+// CHECKBOX INTELIGENTE (VERIFICAR SI YA HAY LÍDER)
+if(regOrg) {
+    regOrg.addEventListener('input', async () => {
+        const empresa = regOrg.value;
+        if(empresa.length > 2) { 
+            const hayAdmin = await existeAdminEnOrganizacion(empresa);
+            if (hayAdmin) {
+                checkAdmin.disabled = true;
+                checkAdmin.checked = false;
+                infoAdmin.style.display = 'block';
+                infoAdmin.textContent = `⚠️ La empresa "${empresa}" ya tiene un líder.`;
+            } else {
+                checkAdmin.disabled = false;
+                infoAdmin.style.display = 'none';
+            }
+        }
+    });
+}
+
+// ALTERNAR ENTRE LOGIN Y REGISTRO
+linkIrRegistro.addEventListener('click', (e) => {
     e.preventDefault();
     formLogin.classList.add('oculto');
     formRegistro.classList.remove('oculto');
-    
-    // Consultar si hay admin
-    const hayAdmin = await existeAdminRegistrado();
-    if (hayAdmin) {
-        checkAdmin.disabled = true;
-        checkAdmin.checked = false;
-        infoAdmin.style.display = 'block';
-    } else {
-        checkAdmin.disabled = false;
-        infoAdmin.style.display = 'none';
-    }
 });
 
 linkIrLogin.addEventListener('click', (e) => {
@@ -145,29 +143,41 @@ linkIrLogin.addEventListener('click', (e) => {
     formLogin.classList.remove('oculto');
 });
 
-// Registrar
+// PROCESO DE REGISTRO
 btnRegistrar.addEventListener('click', async () => {
+    // Validamos que existan los inputs
+    if (!regOrg) { alert("Error: Falta el campo de Organización en el HTML"); return; }
+    
+    const org = regOrg.value.trim(); 
     const email = regEmail.value.trim();
     const pass = regPass.value.trim();
     const quiereSerAdmin = checkAdmin.checked;
 
-    if (!email || !pass) {
-        mostrarAlerta("Por favor, llena todos los campos", true);
+    if (!org || !email || !pass) {
+        mostrarAlerta("Llena todos los campos (Empresa, Correo, Contraseña).", true);
+        return;
+    }
+
+    if (pass.length < 6) {
+        mostrarAlerta("La contraseña debe tener al menos 6 caracteres.", true);
         return;
     }
 
     btnRegistrar.textContent = "Creando...";
     btnRegistrar.disabled = true;
 
-    const resultado = await registrarUsuario(email, pass, quiereSerAdmin);
+    // Llamamos a la base de datos
+    const resultado = await registrarUsuario(email, pass, org, quiereSerAdmin);
 
-    btnRegistrar.textContent = "Crear Cuenta";
+    btnRegistrar.textContent = "Crear Cuenta ✨";
     btnRegistrar.disabled = false;
 
     if (resultado.exito) {
         mostrarAlerta("¡Registro Exitoso! ✅ Redirigiendo...", false);
+        // Limpiar campos
         regEmail.value = "";
         regPass.value = "";
+        regOrg.value = "";
         checkAdmin.checked = false;
         
         setTimeout(() => {
@@ -176,16 +186,20 @@ btnRegistrar.addEventListener('click', async () => {
             inputUser.value = email;
         }, 2000);
     } else {
-        mostrarAlerta(resultado.msj, true);
+        // Mostramos el error real que viene de Firebase
+        mostrarAlerta(resultado.msj, true); 
     }
 });
 
-// Login
+// PROCESO DE LOGIN
 btnLogin.addEventListener('click', async function() {
     const user = inputUser.value.trim();
     const pass = inputPass.value.trim();
 
-    if(!user || !pass) return;
+    if(!user || !pass) {
+        mostrarAlerta("Ingresa correo y contraseña.", true);
+        return;
+    }
 
     btnLogin.textContent = "Entrando...";
     btnLogin.disabled = true;
@@ -196,16 +210,17 @@ btnLogin.addEventListener('click', async function() {
     btnLogin.disabled = false;
 
     if (resultado.exito) {
-        mostrarAlerta(`Bienvenido, ${resultado.rol.toUpperCase()}`, false);
+        let orgTexto = resultado.org ? ` de ${resultado.org}` : "";
+        mostrarAlerta(`Bienvenido, ${resultado.rol.toUpperCase()}${orgTexto}`, false);
         entrarAlSistema(resultado.rol);
     } else {
-        mostrarAlerta("Credenciales incorrectas", true);
+        mostrarAlerta("Credenciales incorrectas ❌", true);
     }
 });
 
 
 // =======================================================
-// 3. ENTRADA AL SISTEMA
+// 4. TRANSICIÓN AL SISTEMA (ANIMACIÓN)
 // =======================================================
 
 function entrarAlSistema(rol) {
@@ -220,23 +235,20 @@ function entrarAlSistema(rol) {
         elementosAdmin.forEach(btn => btn.style.display = '');
     }
 
-    // Animación
     if(coheteHero) coheteHero.classList.add('cohete-despegando');
-    seccionAuth.classList.add('desaparecer'); // Ocultamos la sección de login
+    seccionAuth.classList.add('desaparecer');
 
     setTimeout(() => {
-        seccionAuth.style.display = 'none'; // Quitamos login del flujo
-        
-        // Mostramos App
+        seccionAuth.style.display = 'none'; 
         aplicacionPrincipal.classList.remove('app-oculta');
         aplicacionPrincipal.classList.add('mostrar-app-animado');
-        
         renderizarTabla();
     }, 3000);
 }
 
+
 // =======================================================
-// 4. FUNCIONES DE LA APP
+// 5. FUNCIONALIDADES DE LA APP (DASHBOARD)
 // =======================================================
 
 // Logout
@@ -244,7 +256,7 @@ btnLogout.addEventListener('click', () => {
     if(confirm("¿Cerrar sesión?")) location.reload();
 });
 
-// Navegación Interna
+// Cambiar Vistas (Tablero, Nuevo Proyecto, Informes)
 function cambiarVista(vista) {
     secReporte.classList.add('oculto');
     secRegistro.classList.add('oculto');
@@ -291,16 +303,16 @@ if(formNuevoProyecto) {
         btnSubmit.disabled = false;
 
         if(exito) {
-            mostrarAlerta("Proyecto guardado", false);
+            mostrarAlerta("Proyecto guardado en la nube ☁️", false);
             formNuevoProyecto.reset();
             cambiarVista('reporte');
         } else {
-            mostrarAlerta("Error al guardar", true);
+            mostrarAlerta("Error al guardar.", true);
         }
     });
 }
 
-// Informes
+// Cargar Proyectos para Informes
 async function cargarSelectProyectos() {
     selectProyectos.innerHTML = '<option>Cargando...</option>';
     const proyectos = await obtenerProyectos();
@@ -332,7 +344,7 @@ btnGuardarInf.addEventListener('click', async function() {
     btnGuardarInf.textContent = "Guardando...";
     await guardarInformeProyecto(id, texto);
     btnGuardarInf.textContent = "Guardar Informe";
-    mostrarAlerta("Informe guardado", false);
+    mostrarAlerta("Informe guardado ☁️", false);
     
     txtInforme.value = "";
     selectProyectos.value = "";
@@ -341,7 +353,6 @@ btnGuardarInf.addEventListener('click', async function() {
 // Imprimir
 if (btnImprimir) {
     btnImprimir.addEventListener('click', function() {
-        // Asegúrate de tener <span id="fechaImpresion"> en tu HTML si quieres fecha
         const spanFecha = document.getElementById('fechaImpresion');
         if(spanFecha) spanFecha.textContent = new Date().toLocaleString();
         window.print();
