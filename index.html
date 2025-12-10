@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión Académica</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="contenedorAlertas"></div>
+
+    <div id="contenedorLanding">
+        <header class="landing-nav">
+            <div class="logo-nav">🚀 GestorAcademico</div>
+            <button id="btnIrAlLogin" class="boton-nav-landing">Iniciar Sesión</button>
+        </header>
+
+        <section class="hero-section">
+            <div class="hero-texto">
+                <h1>Domina tus <br> <span class="texto-gradiente">Proyectos Universitarios</span></h1>
+                <p>
+                    La herramienta definitiva para líderes de equipo. Gestiona tareas, 
+                    controla avances y centraliza tus archivos en la nube.
+                    Olvídate del caos en los grupos de WhatsApp.
+                </p>
+            </div>
+            <div class="hero-imagen">
+                <div class="imagen-placeholder">📊</div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="feature-card">
+                <div class="icon">☁️</div>
+                <h3>Todo en la Nube</h3>
+                <p>Accede a tus proyectos desde cualquier lugar. Datos sincronizados en tiempo real.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🔒</div>
+                <h3>Roles Seguros</h3>
+                <p>Sistema de Admin y Usuarios. El líder gestiona, el equipo visualiza.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">📂</div>
+                <h3>Repositorio</h3>
+                <p>Sube PDFs y documentos importantes directamente a cada proyecto.</p>
+            </div>
+        </section>
+
+        <footer class="landing-footer">
+            <p>&copy; 2025 Facultad de Ingeniería de Software</p>
+        </footer>
+    </div>
+
+
+    <section id="seccionAuth" class="bienvenida-container oculto">
+        <button id="btnVolverLanding" class="boton-volver">← Volver al Inicio</button>
+
+        <div class="orbe orbe-1"></div>
+        <div class="orbe orbe-2"></div>
+        <div class="orbe orbe-3"></div>
+
+        <div class="contenido-hero glass-card">
+            <div class="icono-hero">🚀</div>
+            <h2 style="margin-bottom: 20px; color: #2c3e50;">Acceso al Sistema</h2>
+            
+            <div id="formLogin" class="login-form">
+                <input type="email" id="inputUsuario" placeholder="Correo Electrónico" class="input-glass">
+                
+                <div class="contenedor-password">
+                    <input type="password" id="inputPassword" placeholder="Contraseña" class="input-glass">
+                    <span class="icono-ojo" id="ojoLogin" title="Mostrar contraseña"></span>
+                </div>
+                
+                <button id="btnLogin" class="boton-hero" style="margin-top: 15px;">Ingresar ➔</button>
+                <p class="texto-toggle">¿No tienes cuenta? <a href="#" id="irARegistro">Regístrate aquí</a></p>
+            </div>
+
+            <div id="formRegistro" class="login-form oculto">
+                <input type="email" id="regEmail" placeholder="Tu Correo" class="input-glass">
+                
+                <div class="contenedor-password">
+                    <input type="password" id="regPass" placeholder="Crea una Contraseña" class="input-glass">
+                    <span class="icono-ojo" id="ojoRegistro" title="Mostrar contraseña"></span>
+                </div>
+                
+                <div class="grupo-checkbox">
+                    <input type="checkbox" id="checkEsAdmin">
+                    <label for="checkEsAdmin">Soy el Líder (Admin)</label>
+                </div>
+                <p id="infoAdmin" style="color:#d97706; font-size:0.8rem; display:none;">⚠️ Ya existe un líder.</p>
+                
+                <button id="btnRegistrar" class="boton-hero" style="background: linear-gradient(135deg, #10b981, #059669); margin-top: 15px;">Crear Cuenta ✨</button>
+                <p class="texto-toggle">¿Ya tienes cuenta? <a href="#" id="irALogin">Inicia Sesión</a></p>
+            </div>
+        </div>
+    </section>
+
+
+    <div id="aplicacionPrincipal" class="app-oculta">
+        <header>
+            <div class="contenedor encabezado-flex">
+                <h1>📊 Panel de Control</h1>
+                    <nav>
+                        <button id="btnVerReporte" class="boton-nav activo">Tablero</button>
+                        <button id="btnVerRegistro" class="boton-nav solo-admin">Nuevo Proyecto</button>
+                        <button id="btnVerInformes" class="boton-nav solo-admin">Redactar Informes</button>
+                        <button id="btnCerrarSesion" class="boton-logout">Salir 🔒</button>
+                    </nav>
+            </div>
+        </header>
+
+        <main class="contenedor">
+            <section id="seccionReporte" class="seccion-vista">
+                <div class="cabecera-reporte-flex">
+                    <h2 class="titulo-seccion">Tablero de Proyectos</h2>
+                    <button id="btnImprimir" class="boton-imprimir">🖨️ Imprimir</button>
+                </div>
+                <div class="tabla-scroll">
+                    <table class="tabla-academica">
+                        <thead>
+                            <tr>
+                                <th>Proyecto</th>
+                                <th>Integrantes</th>
+                                <th>Vencimiento</th>
+                                <th>Progreso</th>
+                                <th>Estado</th>
+                                <th class="columna-acciones">Gestionar</th> 
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpoTabla"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="seccionRegistro" class="seccion-vista oculto">
+                <h2 class="titulo-seccion">Registrar Nuevo Proyecto</h2>
+                <form id="formularioProyecto" class="formulario-academico">
+                    <div class="grupo-form">
+                        <label>Nombre:</label><input type="text" id="txtNombre" required>
+                    </div>
+                    <div class="grupo-form">
+                        <label>Integrantes:</label><input type="text" id="txtIntegrantes" required>
+                    </div>
+                    <div class="grupo-form">
+                        <label>Fecha Entrega:</label><input type="date" id="txtFecha" required>
+                    </div>
+                    <div class="grupo-form">
+                        <label>Porcentaje de Avance (0 - 100):</label>
+                        <input type="number" id="numAvance" min="0" max="100" placeholder="0" required>
+                    </div>
+                    <button type="submit" class="boton-principal">Guardar Proyecto</button>
+                </form>
+            </section>
+
+            <section id="seccionInformes" class="seccion-vista oculto">
+                <h2 class="titulo-seccion">📝 Bitácora del Líder</h2>
+                <div class="formulario-academico" style="max-width: 100%;">
+                    <div class="grupo-form">
+                        <label>Seleccionar Proyecto:</label>
+                        <select id="selProyectoInforme" class="input-glass" style="color:black; border:1px solid #ccc;">
+                            <option value="">-- Elija un proyecto --</option>
+                        </select>
+                    </div>
+                    <div class="grupo-form">
+                        <label>Cuerpo del Informe:</label>
+                        <textarea id="txtCuerpoInforme" rows="8" style="width:100%; padding:15px; border-radius:8px; border:1px solid #ccc;" placeholder="Escriba aquí el análisis..."></textarea>
+                    </div>
+                    <button id="btnGuardarInforme" class="boton-principal">Guardar Informe</button>
+                </div>
+            </section>
+        </main>
+    </div>
+    <div id="modalVisualizar" class="modal-overlay oculto">
+        <div class="modal-contenido glass-card">
+            <span class="cerrar-modal" id="btnCerrarModal">&times;</span>
+            <h2 id="tituloModal">Nombre del Proyecto</h2>
+            <div class="cuerpo-modal">
+                <p class="label-modal">Informe de Estado / Bitácora:</p>
+                <p id="textoModal" class="texto-informe">Aquí va el texto...</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="modalArchivos" class="modal-overlay oculto">
+        <div class="modal-contenido glass-card" style="max-width: 600px;">
+            <span class="cerrar-modal" id="btnCerrarModalArchivos">&times;</span>
+            <h2 id="tituloModalArchivos" style="margin-bottom: 20px;">Repositorio del Proyecto</h2>
+            <div id="zonaSubidaAdmin" class="grupo-form solo-admin" style="background: #f1f5f9; padding: 15px; border-radius: 8px; border: 2px dashed #cbd5e1;">
+                <label style="margin-bottom: 10px; display:block;">📂 Subir Archivo Nuevo (Máx 1MB):</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="file" id="inputFileProyecto" class="input-glass" style="text-align: left;">
+                    <button id="btnSubirArchivo" class="boton-principal" style="width: auto; padding: 10px 20px;">Subir</button>
+                </div>
+                <p id="msgArchivo" style="font-size: 0.8rem; color: #64748b; margin-top: 5px;"></p>
+            </div>
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+            <h3 style="font-size: 1rem; color: #2c3e50; margin-bottom: 15px;">Archivos Disponibles:</h3>
+            <div id="listaArchivosContainer" style="max-height: 250px; overflow-y: auto;">
+                <p style="color: #999; font-style: italic;">No hay archivos en este proyecto.</p>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
